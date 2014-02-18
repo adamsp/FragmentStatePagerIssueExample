@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">FragmentStatePagerIssueExample</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Switch Fragment</string>
+    <string name="should_be_showing">Should be showing: %s</string>
 
 </resources>

@@ -1,7 +1,6 @@
 package com.example.fragmentstatepagerissueexample.app;
 
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,14 +21,16 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mPager = (ViewPager)findViewById(R.id.pager);
+        mPagerAdapter = new ExamplePagerAdapter(getSupportFragmentManager());
+
         if (savedInstanceState != null) {
             fragmentIsSwitched = savedInstanceState.getBoolean("fragmentIsSwitched");
         } else {
             fragmentIsSwitched = false;
         }
 
-        mPager = (ViewPager)findViewById(R.id.pager);
-        mPagerAdapter = new ExamplePagerAdapter(getSupportFragmentManager());
+        updateAdapterData();
         mPager.setAdapter(mPagerAdapter);
     }
 
@@ -48,12 +49,11 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             fragmentIsSwitched = !fragmentIsSwitched;
+            updateAdapterData();
+            // Force our view pager back to index 0 in order to detach the index 2 fragment and save its state.
             mPager.setCurrentItem(0);
             mPagerAdapter.notifyDataSetChanged();
             return true;
@@ -61,7 +61,29 @@ public class MainActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateAdapterData() {
+        if (fragmentIsSwitched) {
+            mPagerAdapter.labels[2] = "4";
+            mPagerAdapter.colors[2] = Color.BLUE;
+        } else {
+            mPagerAdapter.labels[2] = "3";
+            mPagerAdapter.colors[2] = Color.GREEN;
+        }
+    }
+
     public class ExamplePagerAdapter extends FragmentStatePagerAdapter {
+
+        String[] labels = new String[] {
+                "1",
+                "2",
+                "3"
+        };
+
+        int[] colors = new int[] {
+                Color.RED,
+                Color.YELLOW,
+                Color.GREEN
+        };
 
         public ExamplePagerAdapter(FragmentManager fm) {
             super(fm);
@@ -69,23 +91,7 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int i) {
-            PlaceholderFragment fragment = null;
-            switch(i) {
-                case 0:
-                    fragment = PlaceholderFragment.newInstance("Fragment One", Color.RED);
-                    break;
-                case 1:
-                    fragment = PlaceholderFragment.newInstance("Fragment Two", Color.YELLOW);
-                    break;
-                case 2:
-                    if (fragmentIsSwitched) {
-                        fragment = PlaceholderFragment.newInstance("Fragment Four", Color.BLUE);
-                    } else {
-                        fragment =  PlaceholderFragment.newInstance("Fragment Three", Color.GREEN);
-                    }
-                    break;
-            }
-            return fragment;
+            return PlaceholderFragment.newInstance(labels[i], colors[i]);
         }
 
         @Override
@@ -116,13 +122,23 @@ public class MainActivity extends FragmentActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            rootView.setBackgroundColor(getArguments().getInt("color"));
+            Bundle args = getArguments();
+
+            // Background color always comes from arguments.
+            rootView.setBackgroundColor(args.getInt("color"));
+
+            // If we have a saved state, we pull our label from that. Otherwise it comes from args.
             TextView label = (TextView)rootView.findViewById(R.id.text_label);
             if (savedInstanceState == null) {
-                label.setText(getArguments().getString("label"));
+                label.setText(args.getString("label"));
             } else {
                 label.setText(savedInstanceState.getString("savedStateLabel"));
             }
+
+            // And our "arguments label" shows what this fragment *should* be showing.
+            TextView argsLabel = (TextView)rootView.findViewById(R.id.args_label);
+            argsLabel.setText(getResources().getString(R.string.should_be_showing, args.getString("label")));
+
             return rootView;
         }
 
