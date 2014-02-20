@@ -71,6 +71,8 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
+    // Uncomment these to try the fixed adapter!
+//    public class ExamplePagerAdapter extends FixedFragmentStatePagerAdapter {
     public class ExamplePagerAdapter extends FragmentStatePagerAdapter {
 
         String[] labels = new String[] {
@@ -88,6 +90,11 @@ public class MainActivity extends FragmentActivity {
         public ExamplePagerAdapter(FragmentManager fm) {
             super(fm);
         }
+        // Uncomment these to try the fixed adapter!
+//        @Override
+//        public String getTag(int position) {
+//            return labels[position];
+//        }
 
         @Override
         public Fragment getItem(int i) {
