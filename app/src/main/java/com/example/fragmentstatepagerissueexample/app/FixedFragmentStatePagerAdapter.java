@@ -218,7 +218,13 @@ public abstract class FixedFragmentStatePagerAdapter extends PagerAdapter {
             Parcelable[] fss = bundle.getParcelableArray("states");
             mSavedState.clear();
             mFragments.clear();
-            mSavedFragmentTags = bundle.getStringArrayList("tags");
+
+            ArrayList<String> tags = bundle.getStringArrayList("tags");
+            if (tags != null) {
+                mSavedFragmentTags = tags;
+            } else {
+                mSavedFragmentTags.clear();
+            }
             if (fss != null) {
                 for (int i=0; i<fss.length; i++) {
                     mSavedState.add((Fragment.SavedState)fss[i]);
